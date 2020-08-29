@@ -1,0 +1,78 @@
+library(lavaan)
+library(semPlot)
+
+cincomodel <- 'STI =~ ECI_19_di+ ECI_20_di + ECI_21_di+ ECI_22_di + ECI_23_di + ECI_24_di
+HIV.K =~ ECI_5_di+ ECI_6_di + ECI_7_di+ ECI_15_di + ECI_16_di
+Over.K =~ ECI_1_di +ECI_2_di+ ECI_3_di+ ECI_4_di + ECI_8_di + ECI_9_di + ECI_10_di+ ECI_18_di
+HIV.Prev =~ ECI_11_di+ ECI_12_di + ECI_17_di
+Cond.K =~ ECI_14_di + ECI_13_di'
+
+library(haven)
+inv <- read_sav("C:/Users/pable/Desktop/Validación conocimientos/COnocimientos sida/inv.sav")
+View(inv)
+
+
+inv.sex.conf <- measEq.syntax(configural.model = cincomodel,estimator="MLM", ID.fac = "std.lv", parameterization = "theta",  group = "Ciudad", orthogonal=FALSE, data=inv,
+                              ID.cat = "Wu.Estabrook.2016",return.fit=TRUE, group.equal = c("thresholds"))
+summary(inv.sex.conf, fit.measures=TRUE)
+
+conf<-cfa(cincomodel, orthogonal=FALSE, data=inv, estimator="MLM",group="Ciudad")
+summary(conf, fit.measures=TRUE)
+
+conf1<-cfa(cincomodel, orthogonal=FALSE, data=inv, estimator="WLSMV",group="Ciudad", ordered =names(inv))
+summary(conf1, fit.measures=TRUE)
+
+
+#chupito R.
+
+DFinvar <- read_sav("C:/Users/pable/Desktop/Escritorio antiguo/Investigación/Artículos/Envio MCAS/Marcela y Rolando/2nd análisis/DFinvar.sav")
+View(DFinvar)
+
+#crea el modelo
+fivefactors<-'Neg =~ UCLA1 + UCLA16 + UCLA7 + UCLA12 + UCLA21
+Rel =~ UCLA4 + UCLA6 + UCLA14 + UCLA9 + UCLA20
+Ple =~ UCLA2 + UCLA15 + UCLA8 + UCLA19 + UCLA25
+Sha =~ UCLA5 + UCLA10 + UCLA23 + UCLA17 + UCLA11
+STI =~ UCLA3 + UCLA24 + UCLA18 + UCLA13 + UCLA22'
+
+#Invariance
+inv.sex.conf <- measEq.syntax(configural.model = fivefactors,estimator="MLM", ID.fac = "std.lv", parameterization = "theta",  group = "Sex", orthogonal=FALSE, data=DFinvar,
+                              ID.cat = "Wu.Estabrook.2016",return.fit=TRUE,group.equal = c("thresholds"))
+
+summary(inv.sex.conf, fit.measures=TRUE)
+
+
+inv.sex.metric<- measEq.syntax(configural.model = fivefactors,estimator="MLM", ID.fac = "std.lv", parameterization = "theta",  group = "Sex", orthogonal=FALSE, data=DFinvar, parameterization = "theta",
+                               ID.cat = "Wu.Estabrook.2016",return.fit=TRUE, group.equal = c("thresholds","loadings"),long.equal  = c("thresholds","loadings"))
+
+summary(inv.sex.metric, fit.measures=TRUE)
+
+inv.sex.scalar<- measEq.syntax(configural.model = fivefactors,estimator="MLM", ID.fac = "std.lv", parameterization = "theta",  group = "Sex", orthogonal=FALSE, data=DFinvar, parameterization = "theta",
+                               ID.cat = "Wu.Estabrook.2016",return.fit=TRUE, group.equal = c("thresholds","loadings","intercepts"),long.equal  = c("thresholds","loadings","intercepts"))
+
+summary(inv.sex.scalar, fit.measures=TRUE)
+
+inv.sex.stric<- measEq.syntax(configural.model = fivefactors,estimator="MLM", ID.fac = "std.lv", parameterization = "theta",  group = "Sex", orthogonal=FALSE, data=DFinvar, parameterization = "theta",
+                              ID.cat = "Wu.Estabrook.2016",return.fit=TRUE, group.equal = c("thresholds","loadings","intercepts","residuals"),long.equal  = c("thresholds","loadings","intercepts","residuals"))
+
+summary(inv.sex.stric, fit.measures=TRUE)
+
+#datos mejor organizados
+lavaan::anova(inv.sex.stric,inv.sex.scalar,inv.sex.metric, inv.sex.conf)
+
+fit.stats <- rbind(fitmeasures(inv.sex.conf, fit.measures = c("chisq", "df", "rmsea", "tli", "cfi", "aic")),
+                   fitmeasures(inv.sex.metric, fit.measures = c("chisq", "df", "rmsea", "tli", "cfi", "aic")),
+                   fitmeasures(inv.sex.scalar, fit.measures = c("chisq", "df", "rmsea", "tli", "cfi", "aic")),
+                   fitmeasures(inv.sex.stric, fit.measures = c("chisq", "df", "rmsea", "tli", "cfi", "aic")))
+rownames(fit.stats) <- c("configural", "metric","scalar", "strict")
+fit.stats
+
+#Partial Invariance
+
+model3<-cfa(fivefactors, orthogonal=FALSE, data=DFinvar, estimator="MLM",group="Sex", group.equal=c("loadings","intercepts"))
+summary(model3,fit.measures=TRUE)
+lavTestScore(model3)
+d<-parTable(model3)
+modindices(model3)
+model3partial<-cfa(fivefactors, orthogonal=FALSE, data=DFinvar, estimator="MLM",group="Sex", group.equal=c("loadings","intercepts"), group.partial=c("UCLA3~1"))
+summary(model3partial,fit.measures=TRUE)
