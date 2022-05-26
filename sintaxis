@@ -47,12 +47,12 @@ inv.sex.metric<- measEq.syntax(configural.model = fivefactors,estimator="MLM", I
 
 summary(inv.sex.metric, fit.measures=TRUE)
 
-inv.sex.scalar<- measEq.syntax(configural.model = fivefactors,estimator="MLM", ID.fac = "std.lv", parameterization = "theta",  group = "Sex", orthogonal=FALSE, data=DFinvar, parameterization = "theta",
+inv.sex.scalar<- measEq.syntax(configural.model = fivefactors,estimator="MLM", ID.fac = "std.lv", parameterization = "theta",  group = "Sex", orthogonal=FALSE, data=DFinvar,
                                ID.cat = "Wu.Estabrook.2016",return.fit=TRUE, group.equal = c("thresholds","loadings","intercepts"),long.equal  = c("thresholds","loadings","intercepts"))
 
 summary(inv.sex.scalar, fit.measures=TRUE)
 
-inv.sex.stric<- measEq.syntax(configural.model = fivefactors,estimator="MLM", ID.fac = "std.lv", parameterization = "theta",  group = "Sex", orthogonal=FALSE, data=DFinvar, parameterization = "theta",
+inv.sex.stric<- measEq.syntax(configural.model = fivefactors,estimator="MLM", ID.fac = "std.lv", parameterization = "theta",  group = "Sex", orthogonal=FALSE, data=DFinvar,
                               ID.cat = "Wu.Estabrook.2016",return.fit=TRUE, group.equal = c("thresholds","loadings","intercepts","residuals"),long.equal  = c("thresholds","loadings","intercepts","residuals"))
 
 summary(inv.sex.stric, fit.measures=TRUE)
